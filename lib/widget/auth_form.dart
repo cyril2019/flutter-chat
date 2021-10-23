@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 
 class AuthForm extends StatefulWidget {
-  AuthForm(this.submitFunc);
-  final void Function(String email, String uname, String password, bool isLogin)
-      submitFunc;
+  //Creating a constructor to recieve the submit function from auth_screen.dart.
+  AuthForm(this.submitFunc, this.isLoading);
+  final bool isLoading;
+  //Creating a variable of type Function that will be the parameter of the constructor.
+  final void Function(String email, String uname, String password, bool isLogin,
+      BuildContext ctx) submitFunc;
   @override
   _AuthFormState createState() => _AuthFormState();
 }
@@ -27,8 +30,9 @@ class _AuthFormState extends State<AuthForm> {
     if (isValid == true) {
       //.save() runs all the onSave classes in the form.
       _formKey.currentState?.save();
-      widget.submitFunc(_userEmail, _userName, _userPass, _isLogin);
-      print(_userEmail);
+      //Here we implement the submit function that is defined in the auth_screeen.dart file.
+      //The logic of this function is defined in auth_screen.dart.
+      widget.submitFunc(_userEmail, _userName, _userPass, _isLogin, context);
     }
   }
 
@@ -93,10 +97,12 @@ class _AuthFormState extends State<AuthForm> {
                     SizedBox(
                       height: 12,
                     ),
-                    RaisedButton(
-                      child: Text(_isLogin ? 'Login' : 'SignUp'),
-                      onPressed: _trySubmit,
-                    ),
+                    if (widget.isLoading) CircularProgressIndicator(),
+                    if (!widget.isLoading)
+                      RaisedButton(
+                        child: Text(_isLogin ? 'Login' : 'SignUp'),
+                        onPressed: _trySubmit,
+                      ),
                     FlatButton(
                         textColor: Theme.of(context).primaryColor,
                         onPressed: () {

@@ -1,3 +1,6 @@
+import 'package:chat_app/widget/chat/message_sent.dart';
+import 'package:chat_app/widget/chat/messages.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -6,30 +9,34 @@ class ChatScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          FirebaseFirestore.instance
-              .collection('chat/QEY4RZr8dxH5f0mz4D3T/messages')
-              .add({'text': 'Added on click'});
-        },
-        child: Icon(Icons.add),
-      ),
-      body: StreamBuilder(
-        stream: FirebaseFirestore.instance
-            .collection('chat/QEY4RZr8dxH5f0mz4D3T/messages')
-            .snapshots(),
-        builder: (ctx, AsyncSnapshot snapshot) {
-          final documents = snapshot.data.docs;
-          return ListView.builder(
-            itemBuilder: (ctx, index) {
-              return Container(
-                padding: EdgeInsets.all(8),
-                child: Text(documents[index]['text']),
-              );
+      appBar: AppBar(
+        title: Text('Chat'),
+        actions: [
+          DropdownButton(
+            icon: Icon(Icons.menu),
+            items: [
+              DropdownMenuItem(
+                child: Container(
+                  child: Row(
+                    children: [Icon(Icons.exit_to_app), Text("Logout")],
+                  ),
+                ),
+                value: 'logout',
+              )
+            ],
+            //this takes a function with value of item as parameter.
+            onChanged: (item) {
+              if (item == 'logout') {
+                FirebaseAuth.instance.signOut();
+              }
             },
-            itemCount: documents.length,
-          );
-        },
+          ),
+        ],
+      ),
+      body: Container(
+        child: Column(
+          children: [Expanded(child: Messages()), MessageSend()],
+        ),
       ),
     );
   }
